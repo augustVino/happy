@@ -1,14 +1,14 @@
 # @slopus/happy-wire
 
-Canonical wire specification package for Happy clients and services.
+面向 Happy 客户端与服务的规范级 wire 规范包。
 
-This package defines shared wire contracts as TypeScript types + Zod schemas. It is intentionally small and focused on protocol-level data only.
+该包以 TypeScript 类型 + Zod schema 的形式定义共享的 wire 合约。它被刻意设计得很小且聚焦，仅包含协议级别的数据。
 
-## Quick Examples (Legacy vs New)
+## 快速示例（旧版 vs 新版）
 
-Both legacy and new formats are transported inside encrypted session messages.
+旧版与新版格式都封装在加密的会话（session）消息中传输。
 
-Legacy format examples (decrypted payload):
+旧版格式示例（已解密的载荷）：
 
 ```json
 {
@@ -39,7 +39,7 @@ Legacy format examples (decrypted payload):
 }
 ```
 
-New session protocol format example (decrypted payload):
+新版会话协议格式示例（已解密的载荷）：
 
 ```json
 {
@@ -60,7 +60,7 @@ New session protocol format example (decrypted payload):
 }
 ```
 
-Modern session protocol user envelope (decrypted payload):
+现代会话协议用户信封（已解密的载荷）：
 
 ```json
 {
@@ -80,17 +80,17 @@ Modern session protocol user envelope (decrypted payload):
 }
 ```
 
-Protocol invariant:
-- outer `role = "session"` marks modern session-protocol payloads.
-- inside `content`, envelope `role` is only `"user"` or `"agent"`.
+协议不变量：
+- 外层 `role = "session"` 用于标记现代会话协议的 payload。
+- 在 `content` 内部，信封（envelope）的 `role` 仅为 `"user"` 或 `"agent"`。
 
-Session protocol send rollout (`ENABLE_SESSION_PROTOCOL_SEND`):
-- sender emits modern session-protocol user payloads (`role = "session"` with `content.role = "user"`).
-- default (disabled): app consumes legacy user payloads (`role = "user"`, `content.type = "text"`) and drops modern user payloads.
-- enabled: app consumes modern user payloads and drops legacy user payloads.
-- truthy values: `1`, `true`, `yes` (case-insensitive).
+会话协议发送灰度（`ENABLE_SESSION_PROTOCOL_SEND`）：
+- 发送方发出现代会话协议的用户 payload（`role = "session"` 且 `content.role = "user"`）。
+- 默认（未启用）：应用持续消费旧版用户 payload（`role = "user"`, `content.type = "text"`），并丢弃现代用户 payload。
+- 启用后：应用消费现代用户 payload，并丢弃旧版用户 payload。
+- 真值（truthy）取值：`1`、`true`、`yes`（不区分大小写）。
 
-Wire-level encrypted container (same for legacy and new):
+wire 级别的加密容器（legacy 与 new 均相同）：
 
 ```json
 {
@@ -106,32 +106,32 @@ Wire-level encrypted container (same for legacy and new):
 }
 ```
 
-## Purpose
+## 目的
 
-`@slopus/happy-wire` centralizes definitions for:
-- encrypted message/update payloads
-- session protocol envelope and event stream
-- helper for creating valid session envelopes
+`@slopus/happy-wire` 统一集中定义：
+- 加密的消息/更新载荷
+- 会话协议信封（envelope）与事件流
+- 用于创建有效会话信封的辅助工具
 
-The goal is to keep CLI/app/server/agent on the same wire contract and avoid schema drift.
+目标是让 CLI/app/server/agent 在同一套 wire 合约上运行，并避免 schema 漂移（schema drift）。
 
-## Package Identity
+## 包标识
 
-- Name: `@slopus/happy-wire`
-- Workspace path: `packages/happy-wire`
-- Entry: `src/index.ts`
-- Runtime deps: `zod`, `@paralleldrive/cuid2`
+- 名称：`@slopus/happy-wire`
+- 工作区路径：`packages/happy-wire`
+- 入口：`src/index.ts`
+- 运行时依赖：`zod`, `@paralleldrive/cuid2`
 
-## Public Exports
+## 公共导出
 
-`src/index.ts` exports everything from:
+`src/index.ts` 会从以下位置导出全部内容：
 - `src/messages.ts`
 - `src/legacyProtocol.ts`
 - `src/sessionProtocol.ts`
 
-### `messages.ts` exports
+### `messages.ts` 导出
 
-Schemas + inferred types:
+Schema + 推断出的类型：
 - `SessionMessageContentSchema`
 - `SessionMessage`
 - `SessionMessageSchema`
@@ -158,7 +158,7 @@ Schemas + inferred types:
 - `CoreUpdateContainerSchema`
 - `CoreUpdateContainer`
 
-Compatibility aliases:
+兼容性别名：
 - `ApiMessageSchema` -> `SessionMessageSchema`
 - `ApiMessage` -> `SessionMessage`
 - `ApiUpdateNewMessageSchema` -> `UpdateNewMessageBodySchema`
@@ -172,9 +172,9 @@ Compatibility aliases:
 - `UpdateSchema` -> `CoreUpdateContainerSchema`
 - `Update` -> `CoreUpdateContainer`
 
-### `legacyProtocol.ts` exports
+### `legacyProtocol.ts` 导出
 
-Schemas + inferred types:
+Schema + 推断出的类型：
 - `UserMessageSchema`
 - `UserMessage`
 - `AgentMessageSchema`
@@ -182,9 +182,9 @@ Schemas + inferred types:
 - `LegacyMessageContentSchema`
 - `LegacyMessageContent`
 
-### `sessionProtocol.ts` exports
+### `sessionProtocol.ts` 导出
 
-Schemas + inferred types:
+Schema + 推断出的类型：
 - `sessionRoleSchema`
 - `SessionRole`
 - `sessionTextEventSchema`
@@ -205,19 +205,19 @@ Schemas + inferred types:
 - `CreateEnvelopeOptions`
 - `createEnvelope(...)`
 
-## Wire Type Specifications
+## Wire 类型规范
 
-## Common Primitive Rules
+## 公共基础规则
 
-These are schema-level requirements, not just recommendations.
+这些是 schema 级别的要求，而不仅是建议。
 
 - `id`, `sid`, `machineId`, `call`, `name`, `title`, `description`, `ref`: `string`
 - `seq`, `createdAt`, `updatedAt`, `size`, `width`, `height`, `version`, `activeAt`: `number`
-- All nullable fields are explicitly marked with `.nullable()`.
-- All optional fields are explicitly marked with `.optional()`.
-- `.nullish()` means `undefined | null | <type>`.
+- 所有可空字段都必须明确标注为 `.nullable()`。
+- 所有可选字段都必须明确标注为 `.optional()`。
+- `.nullish()` 表示 `undefined | null | <type>`。
 
-## Message/Update Specs (`messages.ts`)
+## 消息/更新规范（`messages.ts`）
 
 ### `SessionMessageContentSchema`
 
@@ -228,9 +228,9 @@ These are schema-level requirements, not just recommendations.
 }
 ```
 
-Meaning:
-- `t` is a strict discriminator with value `'encrypted'`.
-- `c` is encrypted payload bytes encoded as a string (typically base64 in current usage).
+含义：
+- `t` 是一个取值严格判别器（discriminator），其值为 `'encrypted'`。
+- `c` 是将加密载荷字节编码为字符串后的结果（当前用法中通常为 base64）。
 
 ### `SessionMessageSchema`
 
@@ -245,9 +245,9 @@ Meaning:
 }
 ```
 
-Notes:
-- `localId` is `.nullish()` for compatibility with different producers.
-- `createdAt` and `updatedAt` are required in this shared schema.
+备注：
+- 为了兼容不同的生产方（producer），`localId` 使用 `.nullish()`。
+- 在这个共享 schema 中，`createdAt` 与 `updatedAt` 是必填字段。
 
 ### `MessageMetaSchema`
 
@@ -265,9 +265,9 @@ Notes:
 }
 ```
 
-## Legacy Decrypted Payload Specs (`legacyProtocol.ts`)
+## 旧版已解密载荷规范（`legacyProtocol.ts`）
 
-### `UserMessageSchema` (legacy decrypted payload)
+### `UserMessageSchema`（旧版已解密载荷）
 
 ```ts
 {
@@ -281,7 +281,7 @@ Notes:
 }
 ```
 
-### `AgentMessageSchema` (legacy decrypted payload)
+### `AgentMessageSchema`（旧版已解密载荷）
 
 ```ts
 {
@@ -296,13 +296,13 @@ Notes:
 
 ### `LegacyMessageContentSchema`
 
-Discriminated union on `role`:
+基于 `role` 的判别联合（discriminated union）：
 - `'user'` -> `UserMessageSchema`
 - `'agent'` -> `AgentMessageSchema`
 
-## Top-Level Decrypted Payload Specs (`messages.ts`)
+## 顶层已解密载荷规范（`messages.ts`）
 
-### `SessionProtocolMessageSchema` (modern decrypted payload wrapper)
+### `SessionProtocolMessageSchema`（现代已解密载荷包装器）
 
 ```ts
 {
@@ -314,12 +314,12 @@ Discriminated union on `role`:
 
 ### `MessageContentSchema`
 
-Discriminated union on top-level `role`:
-- `'user'` -> `UserMessageSchema` (legacy)
-- `'agent'` -> `AgentMessageSchema` (legacy)
-- `'session'` -> `SessionProtocolMessageSchema` (modern)
+在顶层 `role` 上进行判别联合：
+- `'user'` -> `UserMessageSchema`（旧版）
+- `'agent'` -> `AgentMessageSchema`（旧版）
+- `'session'` -> `SessionProtocolMessageSchema`（现代）
 
-## Message/Update Specs (`messages.ts`) Continued
+## 消息/更新规范（`messages.ts`）续
 
 ### `VersionedEncryptedValueSchema`
 
@@ -330,7 +330,7 @@ Discriminated union on top-level `role`:
 }
 ```
 
-Used for encrypted, version-tracked blobs that cannot be null when present.
+用于加密的、带版本跟踪（version-tracked）的 blob；当其存在时不允许为 null。
 
 ### `VersionedNullableEncryptedValueSchema`
 
@@ -341,7 +341,7 @@ Used for encrypted, version-tracked blobs that cannot be null when present.
 }
 ```
 
-Used where payload presence can be intentionally reset to null while still versioning.
+用于需要在载荷存在时将其有意重置为 null，同时仍然保留版本信息的场景。
 
 ### `VersionedMachineEncryptedValueSchema`
 
@@ -352,7 +352,7 @@ Used where payload presence can be intentionally reset to null while still versi
 }
 ```
 
-Machine update variant. Equivalent shape to `VersionedEncryptedValueSchema`.
+机器更新（machine update）变体。与 `VersionedEncryptedValueSchema` 具有等价的结构。
 
 ### `UpdateNewMessageBodySchema`
 
@@ -375,9 +375,9 @@ Machine update variant. Equivalent shape to `VersionedEncryptedValueSchema`.
 }
 ```
 
-Important distinction:
-- `metadata.value` is `string` when metadata block exists.
-- `agentState.value` may be `string` or `null` when block exists.
+重要区别：
+- `metadata.value` 是 `string` 当 metadata 块存在。
+- `agentState.value` 可能为 `string` 或 `null` 当 block 存在。
 
 ### `UpdateMachineBodySchema`
 
@@ -394,7 +394,7 @@ Important distinction:
 
 ### `CoreUpdateBodySchema`
 
-Discriminated union on `t` with exactly 3 variants:
+在 `t` 上做判别联合（discriminated union），且仅有且恰好 3 个变体：
 - `'new-message'`
 - `'update-session'`
 - `'update-machine'`
@@ -410,9 +410,9 @@ Discriminated union on `t` with exactly 3 variants:
 }
 ```
 
-## Session Protocol Specs (`sessionProtocol.ts`)
+## 会话协议规范（`sessionProtocol.ts`）
 
-## Role
+## 角色
 
 ### `sessionRoleSchema`
 
@@ -420,15 +420,15 @@ Discriminated union on `t` with exactly 3 variants:
 'user' | 'agent'
 ```
 
-Role meaning:
-- `'user'`: user-originated envelope.
-- `'agent'`: agent-originated envelope.
+角色含义：
+- `'user'`：用户来源的信封（envelope）。
+- `'agent'`：代理来源的信封（envelope）。
 
-## Event Variants
+## 事件变体
 
-`sessionEventSchema` is a discriminated union on `t` with 9 variants.
+`sessionEventSchema` 是以 `t` 为判别器（discriminator）的判别联合（discriminated union），共 9 个变体。
 
-### 1) Text event
+### 1) 文本事件
 
 ```ts
 {
@@ -438,7 +438,7 @@ Role meaning:
 }
 ```
 
-### 2) Service event
+### 2) 服务事件
 
 ```ts
 {
@@ -447,7 +447,7 @@ Role meaning:
 }
 ```
 
-### 3) Tool-call-start event
+### 3) 工具调用开始事件
 
 ```ts
 {
@@ -460,7 +460,7 @@ Role meaning:
 }
 ```
 
-### 4) Tool-call-end event
+### 4) 工具调用结束事件
 
 ```ts
 {
@@ -469,7 +469,7 @@ Role meaning:
 }
 ```
 
-### 5) File event
+### 5) 文件事件
 
 ```ts
 {
@@ -485,7 +485,7 @@ Role meaning:
 }
 ```
 
-### 6) Turn-start event
+### 6) 回合开始事件
 
 ```ts
 {
@@ -493,7 +493,7 @@ Role meaning:
 }
 ```
 
-### 7) Start event
+### 7) Start 事件
 
 ```ts
 {
@@ -502,7 +502,7 @@ Role meaning:
 }
 ```
 
-### 8) Turn-end event
+### 8) 回合结束事件
 
 ```ts
 {
@@ -511,7 +511,7 @@ Role meaning:
 }
 ```
 
-### 9) Stop event
+### 9) Stop 事件
 
 ```ts
 {
@@ -519,7 +519,7 @@ Role meaning:
 }
 ```
 
-## Envelope
+## 信封（Envelope）
 
 ### `sessionEnvelopeSchema`
 
@@ -534,33 +534,33 @@ Role meaning:
 }
 ```
 
-Additional validation (`superRefine`):
-- If `ev.t === 'service'`, then `role` MUST be `'agent'`.
-- If `ev.t === 'start'` or `ev.t === 'stop'`, then `role` MUST be `'agent'`.
-- If `subagent` is present, it MUST satisfy `isCuid(...)`.
+额外校验（`superRefine`）：
+- 如果 `ev.t === 'service'`，那么 `role` MUST be `'agent'`。
+- 如果 `ev.t === 'start'` 或 `ev.t === 'stop'`，那么 `role` MUST be `'agent'`。
+- 如果 `subagent` 存在，则它 MUST 满足 `isCuid(...)`。
 
-## Helper Function Contract
+## 辅助函数合约
 
 ### `createEnvelope(role, ev, opts?)`
 
-Input:
+输入：
 - `role: SessionRole`
 - `ev: SessionEvent`
 - `opts?: { id?: string; time?: number; turn?: string; subagent?: string }`
 
-Behavior:
-- If `opts.id` is absent, generates id using `createId()`.
-- If `opts.time` is absent, sets `time` to `Date.now()`.
-- Includes `turn` only when provided.
-- Includes `subagent` only when provided.
+行为：
+- 如果 `opts.id` 缺失，则使用 `createId()` 生成 `id`。
+- 如果 `opts.time` 缺失，则将 `time` 设为 `Date.now()`。
+- 仅在提供了 `turn` 时才包含 `turn`。
+- 仅在提供了 `subagent` 时才包含 `subagent`。
 
-Output:
-- Returns a `SessionEnvelope` parsed by `sessionEnvelopeSchema`.
-- Throws on invalid combinations (for example `role = 'user'` with `ev.t = 'service'`).
+输出：
+- 返回一个经 `sessionEnvelopeSchema` 解析后的 `SessionEnvelope`。
+- 当组合无效时会抛出异常（例如 `role = 'user'` 且 `ev.t = 'service'`）。
 
-## Normative JSON Examples
+## 规范性 JSON 示例
 
-## Update container with `new-message`
+## 使用 `new-message` 更新容器
 
 ```json
 {
@@ -585,9 +585,9 @@ Output:
 }
 ```
 
-### Decrypted `new-message` content example
+### `new-message` 已解密内容示例
 
-`message.content.c` (ciphertext) decrypts into the payload below for a session-protocol message:
+`message.content.c`（密文）解密后会得到如下内容，用于会话协议消息：
 
 ```json
 {
@@ -608,12 +608,12 @@ Output:
 }
 ```
 
-For user text migration behavior:
-- clients emit only the modern payload (`role = "session"` with `content.role = "user"`).
-- if `ENABLE_SESSION_PROTOCOL_SEND` is disabled, app keeps consuming legacy payloads and drops modern payloads.
-- if `ENABLE_SESSION_PROTOCOL_SEND` is enabled, app consumes modern payloads and drops legacy payloads.
+针对用户文本迁移行为：
+- 客户端只会发出现代 payload（`role = "session"` 且 `content.role = "user"`）。
+- 如果 `ENABLE_SESSION_PROTOCOL_SEND` 被禁用，应用会继续消费旧版 payload，并丢弃现代 payload。
+- 如果 `ENABLE_SESSION_PROTOCOL_SEND` 被启用，应用会消费现代 payload，并丢弃旧版 payload。
 
-## Update container with `update-session`
+## 使用 `update-session` 更新容器
 
 ```json
 {
@@ -635,7 +635,7 @@ For user text migration behavior:
 }
 ```
 
-## Update container with `update-machine`
+## 使用 `update-machine` 更新容器
 
 ```json
 {
@@ -659,7 +659,7 @@ For user text migration behavior:
 }
 ```
 
-## Session protocol envelope
+## 会话协议信封
 
 ```json
 {
@@ -672,7 +672,7 @@ For user text migration behavior:
 }
 ```
 
-## Parsing/Validation Usage
+## 解析/校验使用方式
 
 ```ts
 import {
@@ -691,47 +691,47 @@ if (!maybeEnvelope.success) {
 }
 ```
 
-## Build and Distribution Specification
+## 构建与发布规范
 
-`package.json` contract:
+`package.json` 合约：
 - `main`: `./dist/index.cjs`
 - `module`: `./dist/index.mjs`
 - `types`: `./dist/index.d.cts`
-- `exports["."]` provides both CJS and ESM entrypoints with type paths.
+- `exports["."]` 同时提供 CJS 与 ESM 入口点，并带有类型路径。
 
-Build script:
+构建脚本：
 - `shx rm -rf dist && npx tsc --noEmit && pkgroll`
 
-Tests:
-- `vitest` against `src/*.test.ts`
+测试：
+- 使用 `vitest` 测试 `src/*.test.ts`
 
-Publish gate:
-- `prepublishOnly` runs build + test
+发布门禁：
+- `prepublishOnly` 会执行构建 + 测试
 
-Published files:
+已发布的文件：
 - `dist`
 - `package.json`
 - `README.md`
 
-## Monorepo Build Dependency Behavior
+## Monorepo 构建依赖行为
 
-In this repository, consumer workspaces import `@slopus/happy-wire` through package exports that point at `dist/*`.
+在本仓库中，消费方工作区通过 package exports（指向 `dist/*`）来导入 `@slopus/happy-wire`。
 
-That means on a clean checkout:
-1. Build wire first: `yarn workspace @slopus/happy-wire build`
-2. Then build/typecheck dependents.
+这意味着在一次全新检出（clean checkout）时：
+1. 先构建 wire：`yarn workspace @slopus/happy-wire build`
+2. 再构建/类型检查依赖方。
 
-After publishing to npm, dependents consume prebuilt artifacts from the published tarball.
+发布到 npm 之后，依赖方会从已发布的 tarball 中消费预构建产物。
 
-## Change Policy
+## 变更策略
 
-When modifying wire schemas:
-- Prefer additive changes to keep older consumers compatible.
-- Treat discriminator values (`t`) as protocol-level API and avoid breaking renames.
-- Document semantic changes in this README.
-- Bump package version before downstream releases that depend on new schema behavior.
+当修改 wire schemas 时：
+- 优先采用可加性（additive）的变更，以保持对旧消费方的兼容。
+- 将判别器取值（`t`）视为协议级别 API，避免破坏性的重命名。
+- 在此 README 中记录语义层面的变更。
+- 在下游发布依赖新 schema 行为之前，先提升包版本号。
 
-## Development Commands
+## 开发命令
 
 ```bash
 # from repository root
@@ -739,7 +739,7 @@ yarn workspace @slopus/happy-wire build
 yarn workspace @slopus/happy-wire test
 ```
 
-## Release Commands (maintainers)
+## 发布命令（维护者）
 
 ```bash
 # interactive release target selection from repo root
@@ -749,4 +749,4 @@ yarn release
 yarn workspace @slopus/happy-wire release
 ```
 
-This prepares release artifacts using the same `release-it` flow as other publishable libraries in the monorepo.
+该流程会使用仓库内其他可发布库同样的 `release-it` 流程来准备发布产物。
