@@ -27,13 +27,15 @@ Phase -1 (环境准备)
     ↓
 Phase 0 (加密 PoC)
     ↓
-Phase 2 (骨架 + 认证)      Phase 1 (已完成 ✓)
+Phase 2 (骨架 + 认证)
     ↓
-Phase 3 (核心功能闭环)
+Phase 3 (核心功能闭环) ← 依赖 Phase 1 服务端产出
     ↓
 Phase 4 (功能补全)
     ↓
 Phase 5 (优化打磨)
+
+Phase 1 (服务端已完成 ✓，客户端验证延后至 Phase 3)
 ```
 
 ## Phase -1：环境准备（新增）
@@ -75,7 +77,9 @@ Phase 5 (优化打磨)
 
 **目标**：在已有鸿蒙工程中验证密码学操作的可行性。
 
-**进入条件**：Phase -1 完成（工程可构建）
+**进入条件**：Phase -1 完成（工程可构建，NDK 编译链已验证可用）
+
+> 注：原计划的进入条件"已确认鸿蒙 NDK / CMake 构建方式"和"已能定位 libsodium 编译产物路径"由 Phase -1 的 CMake 配置和 NDK 验证覆盖，不再作为独立前置条件。
 
 **完成标准**（无变化）：
 
@@ -91,23 +95,31 @@ Phase 5 (优化打磨)
 
 **关键变化**：原计划任务 1（搭建编译链）简化为在已有工程中配置 CMake。
 
-## Phase 1：Server WebSocket（标记已完成）
+## Phase 1：Server WebSocket（服务端已完成，客户端验证延后）
 
-**状态**：已完成，跳过。
+**状态**：服务端已完成，客户端验证延后至 Phase 3。
 
-commit `463523f6` 已交付全部计划产出物：
+commit `463523f6` 已交付服务端全部产出物：
 
 | 计划产出 | 实际文件 |
 |---------|---------|
-| `wsTransport.ts` | `packages/happy-server/sources/app/api/wsTransport.ts` (275 行) |
-| `wsHandlers.ts` | `packages/happy-server/sources/app/api/wsHandlers.ts` (384 行) |
-| `main.ts` 挂载 | `packages/happy-server/sources/app/api/api.ts` (+3 行) |
+| `wsTransport.ts` | `packages/happy-server/sources/app/api/wsTransport.ts` |
+| `wsHandlers.ts` | `packages/happy-server/sources/app/api/wsHandlers.ts` |
+| `api.ts` 挂载 | `packages/happy-server/sources/app/api/api.ts` |
 | `package.json` 依赖 | `ws@^8.18.0`, `@types/ws@^8.5.13` |
 
-**补充**：
+**额外交付**：`wsAdapters.ts`（WebSocket 与 eventRouter 适配层），原计划未提及。
 
-- 额外交付 `wsAdapters.ts`（201 行），原计划未提及
-- 客户端验证脚本移至 Phase 3 WebSocket 集成测试
+**原计划完成标准对照**：
+
+| 完成标准 | 状态 |
+|---------|------|
+| WebSocket 可建立连接并通过 JWT 认证 | ✓ 服务端已实现 |
+| 支持 ping、push、request/response、RPC | ✓ 服务端已实现 |
+| 现有 Web 客户端不受影响 | 待 Phase 3 前验证 |
+| 鸿蒙客户端能完成基本连接、收发消息和 RPC 互通 | 延后至 Phase 3 任务 11 |
+
+**风险**：服务端 WebSocket 的 bug 可能要到 Phase 3 集成联调时才会暴露。建议在 Phase 3 开始前用简单脚本快速验证 WebSocket 端点可达性。
 
 ## Phase 2：客户端骨架 + 认证（修订）
 
