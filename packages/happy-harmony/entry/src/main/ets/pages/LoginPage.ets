@@ -3,8 +3,6 @@
  */
 import { AuthService } from 'auth';
 import { AuthResult } from 'auth';
-import { CreateAccountResult } from 'auth';
-import { KeyManager } from 'auth';
 import { LightColors } from 'ui';
 import { AppTypography } from 'ui';
 import { Logger } from 'common';
@@ -32,16 +30,12 @@ export struct LoginPage {
     this.errorMessage = '';
 
     try {
-      // Generate backup key before creating account
-      const keyManager: KeyManager = KeyManager.getInstance();
-      const accountResult: CreateAccountResult = keyManager.createAccount();
-      this.backupKey = keyManager.encodeSecretForBackup(accountResult.secret);
-
-      // Authenticate with server
+      // Create account and authenticate with server
       const authService: AuthService = AuthService.getInstance();
       const result: AuthResult = await authService.createAccount();
 
       if (result.success) {
+        this.backupKey = result.backupKey;
         this.showSuccess = true;
         Logger.info(TAG, 'Account created successfully');
       } else {

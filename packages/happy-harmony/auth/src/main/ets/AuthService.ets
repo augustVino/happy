@@ -23,11 +23,13 @@ export class AuthResult {
   success: boolean = false;
   token: string = '';
   errorMessage: string = '';
+  backupKey: string = '';
 
-  constructor(success: boolean, token: string, errorMessage: string) {
+  constructor(success: boolean, token: string, errorMessage: string, backupKey: string) {
     this.success = success;
     this.token = token;
     this.errorMessage = errorMessage;
+    this.backupKey = backupKey;
   }
 }
 
@@ -78,7 +80,7 @@ class AuthService {
       const result: CreateAccountResult = keyManager.createAccount();
 
       if (result.challenge === null) {
-        return new AuthResult(false, '', 'Failed to generate auth challenge');
+        return new AuthResult(false, '', 'Failed to generate auth challenge', '');
       }
 
       const publicKeyBase64: string = Base64Utils.encode(result.challenge.publicKey);
@@ -104,12 +106,14 @@ class AuthService {
       const apiClient: ApiClient = ApiClient.getInstance();
       apiClient.setAuthToken(authResponse.token);
 
+      const backupKey: string = keyManager.encodeSecretForBackup(result.secret);
+
       Logger.info(TAG, 'Account created successfully');
-      return new AuthResult(true, authResponse.token, '');
+      return new AuthResult(true, authResponse.token, '', backupKey);
     } catch (e) {
       const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
       Logger.error(TAG, `Create account failed: ${errMsg}`);
-      return new AuthResult(false, '', errMsg);
+      return new AuthResult(false, '', errMsg, '');
     }
   }
 
@@ -139,18 +143,18 @@ class AuthService {
       const tokenStore: TokenStore = TokenStore.getInstance();
       const saved: boolean = await tokenStore.setCredentials(credentials);
       if (!saved) {
-        return new AuthResult(false, '', 'Failed to save credentials');
+        return new AuthResult(false, '', 'Failed to save credentials', '');
       }
 
       const apiClient: ApiClient = ApiClient.getInstance();
       apiClient.setAuthToken(authResponse.token);
 
       Logger.info(TAG, 'Login successful');
-      return new AuthResult(true, authResponse.token, '');
+      return new AuthResult(true, authResponse.token, '', '');
     } catch (e) {
       const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
       Logger.error(TAG, `Login failed: ${errMsg}`);
-      return new AuthResult(false, '', errMsg);
+      return new AuthResult(false, '', errMsg, '');
     }
   }
 
@@ -198,7 +202,7 @@ class AuthService {
 
     while (true) {
       if (shouldCancel !== undefined && shouldCancel()) {
-        return new AuthResult(false, '', 'Restore cancelled');
+        return new AuthResult(false, '', 'Restore cancelled', '');
       }
 
       try {
@@ -211,7 +215,7 @@ class AuthService {
           );
 
           if (secret === null) {
-            return new AuthResult(false, '', 'Failed to decrypt auth response');
+            return new AuthResult(false, '', 'Failed to decrypt auth response', '');
           }
 
           // Login with the recovered secret
@@ -223,7 +227,7 @@ class AuthService {
       } catch (e) {
         const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
         Logger.error(TAG, `QR poll error: ${errMsg}`);
-        return new AuthResult(false, '', errMsg);
+        return new AuthResult(false, '', errMsg, '');
       }
 
       if (onProgress !== undefined) {
@@ -245,14 +249,14 @@ class AuthService {
       const secret: Uint8Array | null = keyManager.decodeSecretFromBackup(keyString);
 
       if (secret === null) {
-        return new AuthResult(false, '', 'Invalid key format');
+        return new AuthResult(false, '', 'Invalid key format', '');
       }
 
       return await this.loginWithSecret(Base64Utils.encodeBase64Url(secret));
     } catch (e) {
       const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
       Logger.error(TAG, `Restore with key failed: ${errMsg}`);
-      return new AuthResult(false, '', errMsg);
+      return new AuthResult(false, '', errMsg, '');
     }
   }
 
@@ -277,18 +281,18 @@ class AuthService {
       const credentials: AuthCredentials | null = await tokenStore.getCredentials();
 
       if (credentials === null) {
-        return new AuthResult(false, '', 'No stored credentials');
+        return new AuthResult(false, '', 'No stored credentials', '');
       }
 
       const apiClient: ApiClient = ApiClient.getInstance();
       apiClient.setAuthToken(credentials.token);
 
       Logger.info(TAG, 'Session restored from stored credentials');
-      return new AuthResult(true, credentials.token, '');
+      return new AuthResult(true, credentials.token, '', '');
     } catch (e) {
       const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
       Logger.error(TAG, `Session restore failed: ${errMsg}`);
-      return new AuthResult(false, '', errMsg);
+      return new AuthResult(false, '', errMsg, '');
     }
   }
 
