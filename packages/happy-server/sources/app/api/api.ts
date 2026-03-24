@@ -9,6 +9,7 @@ import { sessionRoutes } from "./routes/sessionRoutes";
 import { connectRoutes } from "./routes/connectRoutes";
 import { accountRoutes } from "./routes/accountRoutes";
 import { startSocket } from "./socket";
+import { startWebSocket } from "./wsTransport";
 import { machinesRoutes } from "./routes/machinesRoutes";
 import { devRoutes } from "./routes/devRoutes";
 import { versionRoutes } from "./routes/versionRoutes";
@@ -98,8 +99,11 @@ export async function startApi() {
         await app.close();
     });
 
-    // Start Socket
+    // Start Socket (Socket.IO - 现有客户端)
     startSocket(typed);
+
+    // Start WebSocket (新客户端 - 鸿蒙)
+    startWebSocket(typed);
 
     // End
     log('API ready on port http://localhost:' + port);

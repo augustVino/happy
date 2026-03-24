@@ -26,9 +26,10 @@
   "devDependencies": {
     "@types/chalk": "^2.2.0",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.12.3",
+    "@types/node": "^25.5.0",
     "@types/tmp": "^0.2.6",
     "@types/uuid": "^9.0.8",
+    "@types/ws": "^8.5.13",
     "dotenv-cli": "^8.0.0",
     "ts-node": "^10.9.2",
     "typescript": "5.9.3",
@@ -40,8 +41,8 @@
     "@fastify/bearer-auth": "^10.1.1",
     "@fastify/cors": "^10.0.1",
     "@prisma/client": "^6.11.1",
-    "@socket.io/redis-streams-adapter": "^0.2.2",
     "@slopus/happy-wire": "^0.1.0",
+    "@socket.io/redis-streams-adapter": "^0.2.2",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/semver": "^7.7.0",
     "axios": "^1.6.8",
@@ -72,6 +73,7 @@
     "uuid": "^9.0.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.0",
+    "ws": "^8.18.0",
     "zod": "3.25.76",
     "zod-to-json-schema": "^3.24.3"
   }
