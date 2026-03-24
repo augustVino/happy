@@ -2,7 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** 为 `packages/happy-harmony` 建立可落地的鸿蒙原生客户端，并按依赖关系逐阶段完成加密、服务端 WebSocket、认证、核心闭环、功能补全与优化。
+**Goal:** 为 `packages/happy-harmony` 建立可落地的鸿蒙原生客户端，并按依赖关系逐阶段完成环境准备、加密、认证、核心闭环、功能补全与优化。
+
+**Target SDK:** HarmonyOS NEXT（纯血鸿蒙），API 12+。目标上架华为应用市场（AppGallery）。DevEco Studio 5.0+。不考虑跨平台复用。
 
 **Architecture:** 采用“先打通阻塞依赖，再交付最小闭环，最后逐步补齐功能”的顺序。原则上不重构现有 `happy-app`、`happy-wire`、`happy-cli` 的既有实现；服务端只做纯新增 WebSocket 通道与处理器，鸿蒙客户端自维护协议与类型定义，避免跨包耦合。
 
@@ -14,9 +16,10 @@
 
 | Phase | 名称 | 目标 | 依赖 | 交付物 |
 |------|------|------|------|------|
-| 0 | 加密 PoC | 让鸿蒙端能完成与现有 CLI/App 一致的加密/解密与认证 | 无 | libsodium FFI、SodiumCrypto、认证 PoC |
-| 1 | Server WebSocket | 给鸿蒙客户端提供独立 WebSocket 端点 | Phase 0 的加密验证结果 | `wsTransport.ts`、`wsHandlers.ts`、`main.ts` 挂载 |
-| 2 | 客户端骨架 + 认证 | 搭起鸿蒙项目、登录、恢复、密钥持久化 | Phase 0 + Phase 1 | 可启动、可登录、可恢复账户的 App |
+| -1 | 环境准备 | 搭建鸿蒙工程骨架，验证构建链路 | 无 | 可构建的鸿蒙工程、模块骨架 |
+| 0 | 加密 PoC | 让鸿蒙端能完成与现有 CLI/App 一致的加密/解密与认证 | Phase -1 | libsodium FFI、SodiumCrypto、认证 PoC |
+| 1 | Server WebSocket | ~~给鸿蒙客户端提供独立 WebSocket 端点~~ (已完成) | 已完成 (463523f6) | `wsTransport.ts`、`wsHandlers.ts`、`api.ts` 挂载 |
+| 2 | 客户端骨架 + 认证 | 搭起鸿蒙项目、登录、恢复、密钥持久化 | Phase 0 | 可启动、可登录、可恢复账户的 App |
 | 3 | 核心功能闭环 | 打通会话列表、消息同步、聊天、RPC、新建会话 | Phase 2 | 最小可用版本（MVP） |
 | 4 | 功能补全 | 对齐 RN 客户端的 P1 / P2 功能 | Phase 3 | 功能完整的鸿蒙客户端 |
 | 5 | 优化打磨 | 做性能、体验、可维护性收口 | Phase 4 | 稳定版优化清单与修复 |
@@ -31,6 +34,47 @@
 
 ---
 
+## Phase -1: 环境准备
+
+**目标**
+
+搭建可构建、可运行的鸿蒙项目骨架，为后续所有开发提供基础。
+
+**进入条件**
+
+- 无（起点）
+
+**完成标准**
+
+- DevEco Studio ≥ 5.0，HarmonyOS NEXT SDK API 12+ 已安装。
+- `packages/happy-harmony/` 可在 DevEco Studio 中打开并构建成功。
+- 模块结构对齐 `docs-harmony/prd/04-app-architecture.md` 分层设计。
+- ohpm 依赖声明完成。
+
+### 任务拆分
+
+1. 确认 DevEco Studio 版本和 HarmonyOS NEXT SDK API 版本。
+2. 在 DevEco Studio 中创建 HarmonyOS 工程（Stage 模型，ArkTS 语言）。
+3. 按目录规范创建模块结构（entry、common、network、auth、sync、encryption、rpc、ui、services）。
+4. 配置 `build-profile.json5`（编译参数、签名配置）。
+5. 配置 `oh-package.json5`（ohpm 依赖声明）。
+6. 配置 `module.json5`（应用权限：网络、数据存储）。
+7. 创建各模块入口文件（空占位，确保构建通过）。
+8. 验证工程在 DevEco Studio 中可构建、可预览。
+
+### 产出文件
+
+- `packages/happy-harmony/` 完整工程目录。
+- `build-profile.json5`、`oh-package.json5`、`module.json5`。
+- 各模块入口占位文件。
+
+### 验收方式
+
+- `hvigorw assembleHap` 构建成功。
+- DevEco Studio Previewer 可预览空页面。
+
+---
+
 ## Phase 0: 加密 PoC
 
 **目标**
@@ -39,8 +83,7 @@
 
 **进入条件**
 
-- 已确认鸿蒙 NDK / ArkTS FFI 的构建方式。
-- 已能定位到 libsodium 的编译产物路径和加载路径。
+- Phase -1 完成（工程可构建，NDK 编译链已验证可用）。
 
 **完成标准**
 
@@ -51,7 +94,7 @@
 
 ### 任务拆分
 
-1. 搭建鸿蒙 NDK / CMake 编译链，产出 `libsodium.so`。
+1. 在已有鸿蒙工程中配置 CMakeLists.txt，将 libsodium 编译为 `libsodium.so`。
 2. 在 ArkTS 中完成 `.so` 动态加载与 `sodium_init()` 调用。
 3. 封装 `SodiumFFI`、`BufferUtils`、`SodiumPath`。
 4. 实现 `SodiumCrypto` 的最小集合：
@@ -83,7 +126,7 @@
 
 ---
 
-## Phase 1: Server WebSocket
+## Phase 1: Server WebSocket（已完成）
 
 **目标**
 
@@ -91,37 +134,46 @@
 
 **进入条件**
 
-- Phase 0 已证明认证与加密基础可用。
-- 已确认协议帧格式与 `docs-harmony/prd/05-protocol-spec.md` 一致。
+~~- Phase 0 已证明认证与加密基础可用。~~
+~~- 已确认协议帧格式与 `docs-harmony/prd/05-protocol-spec.md` 一致。~~
 
-**完成标准**
+> 此阶段已通过 commit `463523f6` 完成。进入条件不再适用。
 
-- WebSocket 可以建立连接并通过 JWT 认证。
-- 支持 ping、push、request/response、RPC 调用。
-- 现有 Web 客户端不受影响。
-- 鸿蒙客户端能完成基本连接、收发消息和 RPC 互通。
+**完成标准对照**
 
-### 任务拆分
+| 完成标准 | 状态 |
+|---------|------|
+| WebSocket 可以建立连接并通过 JWT 认证 | ✓ 服务端已实现 |
+| 支持 ping、push、request/response、RPC 调用 | ✓ 服务端已实现 |
+| 现有 Web 客户端不受影响 | 待 Phase 3 前验证 |
+| 鸿蒙客户端能完成基本连接、收发消息和 RPC 互通 | 延后至 Phase 3 任务 11 |
 
-1. 新增 WebSocket 传输层，复用现有认证与鉴权思路。
-2. 新增消息分发与 ACK 处理。
-3. 从现有 socket 处理逻辑中提取核心业务 handler。
-4. 在 `main.ts` 挂载 WebSocket 路由。
-5. 增加 `ws` 依赖并验证启动流程。
-6. 用最小客户端脚本验证连接、心跳、消息、RPC。
+### 已完成清单
+
+- [x] 新增 WebSocket 传输层（`wsTransport.ts`）。
+- [x] 新增消息分发与 ACK 处理（`wsAdapters.ts`，原计划未提及）。
+- [x] 从现有 socket 处理逻辑中提取核心业务 handler（`wsHandlers.ts`）。
+- [x] 在 `api.ts` 挂载 WebSocket 路由。
+- [x] 增加 `ws` 依赖（`ws@^8.18.0`、`@types/ws@^8.5.13`）。
+- [ ] 用最小客户端脚本验证连接、心跳、消息、RPC → 延后至 Phase 3 任务 11。
 
 ### 产出文件
 
-- `packages/happy-server/sources/app/api/wsTransport.ts`
-- `packages/happy-server/sources/app/api/wsHandlers.ts`
-- `packages/happy-server/sources/main.ts`
-- `packages/happy-server/package.json`
+- `packages/happy-server/sources/app/api/wsTransport.ts` ✓
+- `packages/happy-server/sources/app/api/wsHandlers.ts` ✓
+- `packages/happy-server/sources/app/api/wsAdapters.ts` ✓（额外交付）
+- `packages/happy-server/sources/app/api/api.ts` ✓（挂载点）
+- `packages/happy-server/package.json` ✓
 
 ### 验收方式
 
-- 启动后能在鸿蒙端连上 `/v1/ws`。
-- 消息推送与 RPC 响应都能返回正确 ACK。
-- 回归现有 Socket.IO 路径无异常。
+- ~~启动后能在鸿蒙端连上 `/v1/ws`。~~ → 延后至 Phase 3 任务 11
+- 消息推送与 RPC 响应都能返回正确 ACK（服务端已实现，待客户端联调验证）。
+- 回归现有 Socket.IO 路径无异常 → 待 Phase 3 前验证。
+
+**风险提示**
+
+服务端 WebSocket 的 bug 可能要到 Phase 3 集成联调时才会暴露。建议在 Phase 3 开始前用简单脚本快速验证 WebSocket 端点可达性。
 
 ---
 
@@ -134,7 +186,6 @@
 **进入条件**
 
 - Phase 0 完成并可稳定复现。
-- Phase 1 提供可用的 WebSocket 服务端入口。
 
 **完成标准**
 
@@ -144,8 +195,8 @@
 
 ### 任务拆分
 
-1. 初始化 `packages/happy-harmony` 工程与模块结构。
-2. 对齐 `docs-harmony/prd/04-app-architecture.md` 的目录分层。
+1. ~~初始化 `packages/happy-harmony` 工程与模块结构。~~ → 已在 Phase -1 完成。
+2. ~~对齐 `docs-harmony/prd/04-app-architecture.md` 的目录分层。~~ → 已在 Phase -1 完成。
 3. 接入 `SecureStore`、`TokenStore`、`KeyManager`。
 4. 封装 `ApiClient`、`AuthService`。
 5. 实现 `IndexPage` 启动逻辑。
@@ -202,6 +253,7 @@
 8. 实现 `RpcClient`、`SessionRpc`、`MachineRpc`。
 9. 实现 `PermissionDialog`。
 10. 实现 `NewSessionPage`、`PickMachinePage`、`PickPathPage`。
+11. WebSocket 集成验证：用真实鸿蒙客户端验证连接、心跳、消息、RPC 互通（原 Phase 1 任务 6）。
 
 ### 产出文件
 
@@ -310,10 +362,12 @@
 
 | 里程碑 | 判定条件 |
 |------|------|
+| M-new-1 | DevEco Studio 构建成功，空 Hap 可预览 |
+| M-new-2 | libsodium.so 加载成功，sodium_init() 通过 |
 | M0 | libsodium 构建成功，FFI 可调用 |
-| M1 | Ed25519 签名与现有实现一致 |
+| M1 | 在已有鸿蒙工程中完成，Ed25519 签名一致 |
 | M2 | 真实账户可登录并拉取会话列表 |
-| M3 | WebSocket 端点可连接并收发消息 |
+| M3 | ~~WebSocket 端点可连接并收发消息~~ (已完成) |
 | M4 | 可创建账户并登录 |
 | M5 | 可恢复已有账户 |
 | M6 | 启动后可自动登录 |
@@ -327,14 +381,17 @@
 
 ## 推荐实施顺序
 
-1. 先做 Phase 0，直到加密 PoC 稳定。
-2. 立刻做 Phase 1，给鸿蒙端准备独立传输通道。
-3. 再做 Phase 2，把“能登录”变成产品起点。
-4. 然后做 Phase 3，优先完成真实可用闭环。
-5. 最后按 P1 -> P2 补齐功能，再做体验优化。
+1. 先做 Phase -1，搭建鸿蒙工程骨架并验证构建链路。
+2. 再做 Phase 0，直到加密 PoC 稳定。
+3. Phase 1 已完成，跳过。
+4. 再做 Phase 2，把”能登录”变成产品起点。
+5. 然后做 Phase 3，优先完成真实可用闭环（含 WebSocket 集成验证）。
+6. 最后按 P1 -> P2 补齐功能，再做体验优化。
 
 ## 备注
 
 - 这个计划默认鸿蒙客户端是新的独立工程，不复用 RN 客户端运行时。
 - 如果 Phase 0 选择了备选方案，Phase 1 之后的客户端实现可能需要相应调整加密入口与协议字段。
 - 若后续需要进一步拆成周计划或任务卡，可以在 `docs-harmony/develop/` 下继续追加更细的执行文档。
+- Phase 1 (Server WebSocket) 已通过 commit `463523f6` 完成服务端实现，客户端验证延后至 Phase 3。
+- SDK 选型确定为 HarmonyOS NEXT API 12+（纯血鸿蒙），不使用 OpenHarmony。
