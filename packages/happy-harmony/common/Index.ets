@@ -26,3 +26,39 @@ export { QRAuthKeyPair } from './src/main/ets/types/WireTypes';
 export { QRAuthState } from './src/main/ets/types/WireTypes';
 export { AuthState } from './src/main/ets/types/AppState';
 export { RestoreMethod } from './src/main/ets/types/AppState';
+export { AppStateKeys } from './src/main/ets/types/AppState';
+
+// WebSocket frame types
+export { WsIncomingFrame } from './src/main/ets/types/WsFrameTypes';
+export { WsOutgoingFrame } from './src/main/ets/types/WsFrameTypes';
+
+// Update event types
+export { UpdateContainer } from './src/main/ets/types/UpdateTypes';
+export { VersionedEncryptedValue } from './src/main/ets/types/UpdateTypes';
+export { VersionedNullableEncryptedValue } from './src/main/ets/types/UpdateTypes';
+export { NewMessageBody } from './src/main/ets/types/UpdateTypes';
+export { NewSessionBody } from './src/main/ets/types/UpdateTypes';
+export { UpdateSessionBody } from './src/main/ets/types/UpdateTypes';
+export { DeleteSessionBody } from './src/main/ets/types/UpdateTypes';
+export { NewMachineBody } from './src/main/ets/types/UpdateTypes';
+export { UpdateMachineBody } from './src/main/ets/types/UpdateTypes';
+export { UpdateAccountBody } from './src/main/ets/types/UpdateTypes';
+export { EphemeralEvent } from './src/main/ets/types/UpdateTypes';
+export { ActivityEphemeral } from './src/main/ets/types/UpdateTypes';
+export { MachineActivityEphemeral } from './src/main/ets/types/UpdateTypes';
+export { UsageEphemeral } from './src/main/ets/types/UpdateTypes';
+
+// Session data models
+export { Session } from './src/main/ets/types/SessionTypes';
+export { SessionMessage } from './src/main/ets/types/SessionTypes';
+export { Machine } from './src/main/ets/types/SessionTypes';
+export { UserProfile } from './src/main/ets/types/SessionTypes';
+export { MessageEventTypes } from './src/main/ets/types/SessionTypes';
+export { TurnEndStatus } from './src/main/ets/types/SessionTypes';
+export { MessageRoles } from './src/main/ets/types/SessionTypes';
+
+// Crypto utilities
+export { AESGCMUtils } from './src/main/ets/utils/AESGCMUtils';
+
+// Navigation parameter types
+export { NavParams } from './src/main/ets/types/NavParams';

@@ -11,3 +11,10 @@ export { KeyTreeState } from 'common';
 
 // Secure storage
 export { SecureStore } from './SecureStore';
+
+// Encryption services
+export { EncryptionService } from './EncryptionService';
+export { DataKeyManager } from './DataKeyManager';
+export { AesGcmCrypto } from './AesGcmCrypto';
+export { SessionEncryption } from './SessionEncryption';
+export { MachineEncryption } from './MachineEncryption';

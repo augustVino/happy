@@ -37,7 +37,8 @@ struct Index {
 
       if (result.success) {
         this.authState = AuthState.AUTHENTICATED;
-        Logger.info(TAG, 'User authenticated');
+        Logger.info(TAG, 'User authenticated, navigating to sessions');
+        router.replaceUrl({ url: 'pages/SessionsPage' });
       } else {
         this.authState = AuthState.UNAUTHENTICATED;
         Logger.info(TAG, 'No stored credentials');
@@ -99,7 +100,8 @@ struct Index {
         .borderRadius(12)
         .width('60%')
         .onClick(() => {
-          Logger.info(TAG, 'Navigate to sessions (Phase 3)');
+          Logger.info(TAG, 'Navigate to sessions');
+          router.replaceUrl({ url: 'pages/SessionsPage' });
         })
 
       Button('Logout')

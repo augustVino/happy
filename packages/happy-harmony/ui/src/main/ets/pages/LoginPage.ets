@@ -8,6 +8,7 @@ import { KeyManager } from 'auth';
 import { LightColors } from '../theme/Colors';
 import { AppTypography } from '../theme/Typography';
 import { Logger } from 'common';
+import router from '@ohos.router';
 
 const TAG = 'LoginPage';
 
@@ -160,8 +161,8 @@ export struct LoginPage {
               .width('100%')
               .border({ width: 1, color: LightColors.PRIMARY })
               .onClick(() => {
-                // Phase 3: Navigate to SessionsPage
-                Logger.info(TAG, 'Navigate to sessions (Phase 3)');
+                Logger.info(TAG, 'Navigate to sessions');
+                router.replaceUrl({ url: 'pages/SessionsPage' });
               })
           }
           .width('100%')

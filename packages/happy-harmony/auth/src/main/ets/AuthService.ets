@@ -100,7 +100,7 @@ class AuthService {
       const tokenStore: TokenStore = TokenStore.getInstance();
       const saved: boolean = await tokenStore.setCredentials(credentials);
       if (!saved) {
-        return new AuthResult(false, '', 'Failed to save credentials');
+        return new AuthResult(false, '', 'Failed to save credentials', '');
       }
 
       const apiClient: ApiClient = ApiClient.getInstance();

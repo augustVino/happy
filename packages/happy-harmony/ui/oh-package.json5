@@ -9,6 +9,8 @@
     "common": "file:../common",
     "auth": "file:../auth",
     "sync": "file:../sync",
-    "rpc": "file:../rpc"
+    "rpc": "file:../rpc",
+    "encryption": "file:../encryption",
+    "network": "file:../network"
   }
 }

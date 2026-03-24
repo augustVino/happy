@@ -2,6 +2,11 @@
   "src": [
     "pages/Index",
     "pages/LoginPage",
-    "pages/RestorePage"
+    "pages/RestorePage",
+    "pages/SessionsPage",
+    "pages/ChatPage",
+    "pages/NewSessionPage",
+    "pages/PickMachinePage",
+    "pages/PickPathPage"
   ]
 }

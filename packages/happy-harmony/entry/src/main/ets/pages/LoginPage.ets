@@ -155,7 +155,8 @@ export struct LoginPage {
               .width('100%')
               .border({ width: 1, color: LightColors.PRIMARY })
               .onClick(() => {
-                Logger.info(TAG, 'Navigate to sessions (Phase 3)');
+                Logger.info(TAG, 'Navigate to sessions');
+                router.replaceUrl({ url: 'pages/SessionsPage' });
               })
           }
           .width('100%')

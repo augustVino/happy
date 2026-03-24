@@ -181,7 +181,7 @@ export struct RestorePage {
             .borderRadius(12)
             .width('80%')
             .onClick(() => {
-              // Phase 3: Navigate to SessionsPage
+              router.replaceUrl({ url: 'pages/SessionsPage' });
             })
         }
         .layoutWeight(1)

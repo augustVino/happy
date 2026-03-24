@@ -11,6 +11,7 @@ import { AppTypography } from '../theme/Typography';
 import { Base64Utils } from 'common';
 import { Logger } from 'common';
 import { QrCodeView } from '../components/QrCodeView';
+import router from '@ohos.router';
 
 const TAG = 'RestorePage';
 
@@ -180,7 +181,7 @@ export struct RestorePage {
             .borderRadius(12)
             .width('80%')
             .onClick(() => {
-              // Phase 3: Navigate to SessionsPage
+              router.replaceUrl({ url: 'pages/SessionsPage' });
             })
         }
         .layoutWeight(1)
