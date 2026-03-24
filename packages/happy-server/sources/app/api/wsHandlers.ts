@@ -6,7 +6,7 @@
  */
 
 import { log } from '@/utils/log';
-import { buildUpdateSessionUpdate, ClientConnection, eventRouter } from '@/app/events/eventRouter';
+import { buildUpdateSessionUpdate, buildNewMessageUpdate, ClientConnection, eventRouter } from '@/app/events/eventRouter';
 import { randomKeyNaked } from '@/utils/randomKeyNaked';
 import { db } from '@/storage/db';
 import { allocateSessionSeq, allocateUserSeq } from '@/storage/seq';
@@ -334,7 +334,6 @@ export function wsMessageHandler(
             });
 
             // 发送更新事件
-            const { buildNewMessageUpdate } = await import('@/app/events/eventRouter');
             const updatePayload = buildNewMessageUpdate(msg, sid, updSeq, randomKeyNaked(12));
             eventRouter.emitUpdate({
                 userId,

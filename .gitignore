@@ -63,8 +63,12 @@ build/
 **/libs/arm64-v8a/
 **/cpp/build_*/
 **/cpp/libsodium/
+**/cpp/libsodium-prebuilt/
 **/cpp/types/
 **/.hvigor/
+# DevEco Studio preview
+**/.preview/
+
 .agents
 .cursor
 .vscode

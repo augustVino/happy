@@ -164,13 +164,6 @@ export function startWebSocket(app: Fastify): void {
             log({ module: 'websocket', level: 'error' }, `WebSocket error: ${error.message}`);
         });
 
-        // 消息处理（底层原始消息，由适配层处理）
-        ws.on('message', (data: Buffer) => {
-            // 由 wsAdapters.ts 中的适配层处理
-            // 这里仅记录日志
-            log({ module: 'websocket' }, `Received message: ${data.length} bytes`);
-        });
-
         // 注册 RPC 监听器映射
         if (!rpcListeners.has(userId)) {
             rpcListeners.set(userId, new Map());

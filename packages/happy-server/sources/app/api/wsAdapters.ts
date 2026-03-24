@@ -17,7 +17,7 @@ export interface WsAdapterSocket {
     /** 监听客户端事件 */
     on: (event: string, handler: WsEventHandler) => void;
     /** 移除事件监听 */
-    off: (event: string, handler: WsEventHandler) => void;
+    off: (event: string, handler?: WsEventHandler) => void;
     /** 连接状态 */
     connected: boolean;
     /** 唯一标识 */
@@ -53,15 +53,6 @@ interface WsOutgoingFrame {
 }
 
 /**
- * 挂起的 ACK 回调
- */
-interface PendingAck {
-    resolve: (response: unknown) => void;
-    reject: (error: Error) => void;
-    timeout: NodeJS.Timeout;
-}
-
-/**
  * 适配 WebSocket 到 Socket.IO 兼容接口
  *
  * @param ws - 原始 WebSocket 实例
@@ -71,8 +62,6 @@ interface PendingAck {
 export function adaptWebSocketToSocketIO(ws: WebSocket, connectionId: string): WsAdapterSocket {
     // 事件处理器映射
     const handlers = new Map<string, WsEventHandler>();
-    // 挂起的 ACK 回调
-    const pendingAcks = new Map<string, PendingAck>();
 
     // 监听 WebSocket 消息
     ws.on('message', (data: Buffer) => {
@@ -99,13 +88,8 @@ export function adaptWebSocketToSocketIO(ws: WebSocket, connectionId: string): W
         }
     });
 
-    // 清理挂起的 ACK
+    // 清理处理器
     ws.on('close', () => {
-        for (const [id, ack] of pendingAcks.entries()) {
-            clearTimeout(ack.timeout);
-            ack.reject(new Error('Connection closed'));
-            pendingAcks.delete(id);
-        }
         handlers.clear();
     });
 
@@ -163,39 +147,4 @@ function sendAck(ws: WebSocket, originalEvent: string, id: string, data: unknown
     };
 
     ws.send(JSON.stringify(frame));
-}
-
-/**
- * 创建带超时的 ACK Promise
- *
- * 用于兼容 Socket.IO 的 emitWithAck 模式
- */
-export function createAckPromise(
-    socket: WsAdapterSocket,
-    event: string,
-    data: unknown,
-    timeout: number
-): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-        const id = `ack_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-
-        // 设置超时
-        const timer = setTimeout(() => {
-            socket.off(`${event}:ack`, ackHandler);
-            reject(new Error(`ACK timeout: ${event}`));
-        }, timeout);
-
-        // ACK 处理器
-        const ackHandler = (response: unknown) => {
-            clearTimeout(timer);
-            resolve(response);
-        };
-
-        // 注册临时 ACK 监听
-        socket.on(`${event}:ack`, ackHandler);
-
-        // 发送请求
-        const dataWithAck = typeof data === 'object' && data !== null ? { ...data, _ackId: id } : { _ackId: id };
-        socket.emit(event, dataWithAck);
-    });
 }
