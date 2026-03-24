@@ -41,7 +41,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-.claude/settings.local.json
+.claude
 .plan
 
 CLAUDE.local.md
@@ -52,3 +52,20 @@ CLAUDE.local.md
 notes/
 # ralphex progress logs
 progress*.txt
+
+# HarmonyOS / DevEco Studio
+.idea/
+oh_modules/
+oh-package-lock.json5
+hvigor/
+build/
+.cxx/
+**/libs/arm64-v8a/
+**/cpp/build_*/
+**/cpp/libsodium/
+**/cpp/types/
+**/.hvigor/
+.agents
+.cursor
+.vscode
+.github
