@@ -1,0 +1,10 @@
+{
+  "modelVersion": "6.0.2",
+  "name": "happy-harmony",
+  "version": "1.0.0",
+  "description": "Happy Coder - HarmonyOS Client",
+  "main": "",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

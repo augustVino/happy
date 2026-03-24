@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "encryption",
+    "type": "har",
+    "description": "$string:encryption_desc",
+    "deviceTypes": ["phone", "tablet"]
+  }
+}

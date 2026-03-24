@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "auth",
+    "type": "har",
+    "description": "$string:auth_desc",
+    "deviceTypes": ["phone", "tablet"]
+  }
+}

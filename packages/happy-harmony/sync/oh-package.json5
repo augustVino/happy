@@ -1,0 +1,13 @@
+{
+  "name": "sync",
+  "version": "1.0.0",
+  "description": "Happy Coder Sync Module",
+  "main": "Index.ets",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "common": "file:../common",
+    "network": "file:../network",
+    "encryption": "file:../encryption"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "services",
+    "type": "har",
+    "description": "$string:services_desc",
+    "deviceTypes": ["phone", "tablet"]
+  }
+}

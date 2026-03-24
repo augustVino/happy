@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "ui",
+    "type": "har",
+    "description": "$string:ui_desc",
+    "deviceTypes": ["phone", "tablet"]
+  }
+}

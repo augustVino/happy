@@ -15,11 +15,11 @@ packages/
 
 ## 常用命令
 
-| 命令 | 说明 |
-|------|------|
-| `yarn install` | 安装所有依赖 |
-| `yarn cli` | 从源码运行 CLI |
-| `yarn web` | 启动 Web 客户端 |
+| 命令           | 说明            |
+| -------------- | --------------- |
+| `yarn install` | 安装所有依赖    |
+| `yarn cli`     | 从源码运行 CLI  |
+| `yarn web`     | 启动 Web 客户端 |
 
 ## 全局约定
 
@@ -31,10 +31,10 @@ packages/
 
 ### Import 别名
 
-| 包 | 别名 | 映射 |
-|----|------|------|
-| CLI | `@/` | `./src/` |
-| App | `@/` | `./sources/` |
+| 包     | 别名 | 映射         |
+| ------ | ---- | ------------ |
+| CLI    | `@/` | `./src/`     |
+| App    | `@/` | `./sources/` |
 | Server | `@/` | `./sources/` |
 
 ## 子包详细指引
@@ -48,3 +48,7 @@ packages/
 ## Patches
 
 `patches/fix-pglite-prisma-bytes.cjs` — 修复 pglite-prisma-adapter 的 Bytes 列序列化问题，`postinstall` 时自动应用。
+
+## Notes
+
+涉及到鸿蒙 os 的开发，需要严格遵守 [rule](.claude/rule.md)。

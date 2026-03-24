@@ -1,0 +1,14 @@
+{
+  "name": "ui",
+  "version": "1.0.0",
+  "description": "Happy Coder UI Module",
+  "main": "Index.ets",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "common": "file:../common",
+    "auth": "file:../auth",
+    "sync": "file:../sync",
+    "rpc": "file:../rpc"
+  }
+}

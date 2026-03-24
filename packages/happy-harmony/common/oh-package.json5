@@ -1,0 +1,9 @@
+{
+  "name": "common",
+  "version": "1.0.0",
+  "description": "Happy Coder Common Module",
+  "main": "Index.ets",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

@@ -1,0 +1,12 @@
+{
+  "name": "rpc",
+  "version": "1.0.0",
+  "description": "Happy Coder RPC Module",
+  "main": "Index.ets",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "common": "file:../common",
+    "network": "file:../network"
+  }
+}

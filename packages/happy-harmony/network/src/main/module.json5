@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "network",
+    "type": "har",
+    "description": "$string:network_desc",
+    "deviceTypes": ["phone", "tablet"]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "rpc",
+    "type": "har",
+    "description": "$string:rpc_desc",
+    "deviceTypes": ["phone", "tablet"]
+  }
+}

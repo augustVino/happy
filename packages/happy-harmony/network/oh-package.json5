@@ -1,0 +1,11 @@
+{
+  "name": "network",
+  "version": "1.0.0",
+  "description": "Happy Coder Network Module",
+  "main": "Index.ets",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "common": "file:../common"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Happy Coder - HarmonyOS Client"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "Happy Coder Main Ability"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "Happy Coder"
+    }
+  ]
+}

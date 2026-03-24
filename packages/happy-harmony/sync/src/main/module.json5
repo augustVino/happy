@@ -1,0 +1,8 @@
+{
+  "module": {
+    "name": "sync",
+    "type": "har",
+    "description": "$string:sync_desc",
+    "deviceTypes": ["phone", "tablet"]
+  }
+}
