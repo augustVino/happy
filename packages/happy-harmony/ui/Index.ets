@@ -1,1 +1,2 @@
-// UI module exports - to be implemented in Phase 2/3
+// UI module exports
+export { LightColors, DarkColors, AppTypography, LoginPage, RestorePage, QrCodeView } from './src/main/ets/Index';

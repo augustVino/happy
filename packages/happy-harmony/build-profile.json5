@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/liepin/.ohos/config/default_happy-harmony_4kGb-Vqdb0rwkggAI28ZMf_jatbqB9suPtM38CAYVZc=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B25AA9B4BA960EFF14848F356C5357953BA779DEE68DF6602FE86DDD17AA0EC5572FD168FB5202C",
+          "profile": "/Users/liepin/.ohos/config/default_happy-harmony_4kGb-Vqdb0rwkggAI28ZMf_jatbqB9suPtM38CAYVZc=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/liepin/.ohos/config/default_happy-harmony_4kGb-Vqdb0rwkggAI28ZMf_jatbqB9suPtM38CAYVZc=.p12",
+          "storePassword": "0000001B9E2BAB5F55133FE2A90829C4E331B7949B5AD9178933F21737C0DEEC754811121CC8DDF5620458"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",

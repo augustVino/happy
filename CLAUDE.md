@@ -26,7 +26,7 @@ packages/
 - **包管理器**: Yarn 1.22.22
 - **缩进**: 4 空格
 - **验证**: 统一使用 Zod
-- **函数式风格**: 避免类，偏好函数和声明式模式
+- **函数式风格**: 避免类，偏好函数和声明式模式（不适用于 HarmonyOS 包，ArkTS 强制使用类）
 - **测试**: Vitest，`.spec.ts` 或 `.test.ts`，与源文件同目录
 
 ### Import 别名
@@ -49,6 +49,6 @@ packages/
 
 `patches/fix-pglite-prisma-bytes.cjs` — 修复 pglite-prisma-adapter 的 Bytes 列序列化问题，`postinstall` 时自动应用。
 
-## Notes
+## HarmonyOS 开发
 
-涉及到鸿蒙 os 的开发，需要严格遵守 [rule](.claude/rule.md)。
+涉及鸿蒙 OS 开发时，`.claude/rules/` 下的规则文件会自动加载，包括 ArkTS 语法约束、动画、组件封装、布局、手势、主题等规范。

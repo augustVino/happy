@@ -62,7 +62,7 @@ export class BufferUtils {
    */
   static toUtf8String(data: Uint8Array): string {
     const helper = new util.TextDecoder();
-    return helper.decodeWithStream(new Uint8Array(data));
+    return helper.decode(new Uint8Array(data));
   }
 
   /**

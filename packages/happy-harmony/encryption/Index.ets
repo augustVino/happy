@@ -8,3 +8,6 @@ export { BufferUtils } from 'common';
 export { HmacSha512Utils } from 'common';
 export { KeyDerivation } from 'common';
 export { KeyTreeState } from 'common';
+
+// Secure credential storage
+export { SecureStore } from './src/main/ets/SecureStore';

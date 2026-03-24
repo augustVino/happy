@@ -1,1 +1,2 @@
-// Network module exports - to be implemented in Phase 3
+// Network module exports
+export { ApiClient, ApiResponse, AuthApi } from './src/main/ets/Index';
