@@ -13,6 +13,7 @@ import { KeyDerivation } from 'common';
 import { SodiumCrypto } from 'common';
 import { SodiumFFI } from 'common';
 import { BufferUtils } from 'common';
+import { Base64Utils } from 'common';
 import { Logger } from 'common';
 
 const TAG = 'EncryptionService';
@@ -57,13 +58,13 @@ class EncryptionService {
         return false;
       }
 
-      const secretHex: string = credentials.secret;
-      if (secretHex.length === 0) {
+      const secretBase64Url: string = credentials.secret;
+      if (secretBase64Url.length === 0) {
         Logger.error(TAG, 'Master secret is empty');
         return false;
       }
 
-      this.masterSecret = BufferUtils.fromHex(secretHex);
+      this.masterSecret = Base64Utils.decodeBase64Url(secretBase64Url);
       if (this.masterSecret.length !== 32) {
         Logger.error(TAG, `Master secret must be 32 bytes, got ${this.masterSecret.length}`);
         return false;

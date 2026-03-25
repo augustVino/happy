@@ -59,15 +59,22 @@ export class AppViewModel {
       // Step 2: Connect WebSocket
       await this.syncEngine.connectWebSocket(token);
 
-      // Step 3: Register WebSocket state change listener
+      // Step 3: Register data changed callback for real-time UI updates
+      this.syncEngine.onDataChanged(() => {
+        this.refreshFromSyncEngine();
+        this.syncToAppStorage();
+        Logger.info(TAG, 'Data changed - UI refreshed');
+      });
+
+      // Step 4: Register WebSocket state change listener
       this.wsTransport.onStateChange((newState: string, _oldState: string): void => {
         this.onConnectionChanged(newState === 'connected');
       });
 
-      // Step 4: Sync initial data from SyncEngine to local @Track state
+      // Step 5: Sync initial data from SyncEngine to local @Track state
       this.refreshFromSyncEngine();
 
-      // Step 5: Set AppStorage for cross-component @StorageLink access
+      // Step 6: Set AppStorage for cross-component @StorageLink access
       this.syncToAppStorage();
 
       Logger.info(TAG, 'AppViewModel initialized successfully');
@@ -179,6 +186,7 @@ export class AppViewModel {
    * Disconnect and clean up resources.
    */
   dispose(): void {
+    this.syncEngine.onDataChanged(null);
     this.syncEngine.disconnect();
     this.clearActiveSession();
     this.clearError();

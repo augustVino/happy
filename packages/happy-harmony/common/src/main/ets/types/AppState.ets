@@ -21,4 +21,6 @@ export class AppStateKeys {
   static readonly IS_DATA_READY: string = 'isDataReady';
   static readonly USER_ID: string = 'userId';
   static readonly ACTIVE_SESSION_ID: string = 'activeSessionId';
+  static readonly NEW_MESSAGE_SEQ: string = 'newMessageSeq';
+  static readonly JWT_TOKEN: string = 'jwt_token';
 }

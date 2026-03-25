@@ -4,9 +4,11 @@
  */
 import { SodiumFFI } from 'common';
 import { AuthState } from 'common';
+import { AppStateKeys } from 'common';
 import { AuthService } from 'auth';
 import { LightColors } from 'ui';
 import { AppTypography } from 'ui';
+import { AppViewModel } from 'ui';
 import { Logger } from 'common';
 import router from '@ohos.router';
 import sodiumWrapper from 'libentry.so';
@@ -37,6 +39,7 @@ struct Index {
 
       if (result.success) {
         this.authState = AuthState.AUTHENTICATED;
+        AppStorage.setOrCreate(AppStateKeys.JWT_TOKEN, result.token);
         Logger.info(TAG, 'User authenticated, navigating to sessions');
         router.replaceUrl({ url: 'pages/SessionsPage' });
       } else {
@@ -110,6 +113,8 @@ struct Index {
         .backgroundColor(Color.Transparent)
         .margin({ top: 16 })
         .onClick(async () => {
+          const appViewModel: AppViewModel = AppViewModel.getInstance();
+          appViewModel.dispose();
           const authService: AuthService = AuthService.getInstance();
           await authService.logout();
           this.authState = AuthState.UNAUTHENTICATED;

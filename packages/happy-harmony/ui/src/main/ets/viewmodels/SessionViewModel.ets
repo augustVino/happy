@@ -199,9 +199,27 @@ export class SessionViewModel {
     if (freshMessages.length > 0) {
       this.messages = freshMessages;
     }
+    this.updateThinkingState();
   }
 
   // ---- Private methods ----
+
+  /**
+   * Update thinking state by scanning messages for TURN_START / TURN_END events.
+   * The most recent thinking-related event determines the current state.
+   */
+  private updateThinkingState(): void {
+    let thinking: boolean = false;
+    for (let i: number = 0; i < this.messages.length; i++) {
+      const msg: SessionMessage = this.messages[i];
+      if (msg.eventType === MessageEventTypes.TURN_START) {
+        thinking = true;
+      } else if (msg.eventType === MessageEventTypes.TURN_END || msg.eventType === MessageEventTypes.STOP) {
+        thinking = false;
+      }
+    }
+    this.isThinking = thinking;
+  }
 
   /**
    * Check if a message is already in the local list (by ID).

@@ -3,6 +3,7 @@
  */
 import { AuthService } from 'auth';
 import { AuthResult } from 'auth';
+import { AppStateKeys } from 'common';
 import { LightColors } from 'ui';
 import { AppTypography } from 'ui';
 import { Logger } from 'common';
@@ -37,6 +38,7 @@ export struct LoginPage {
       if (result.success) {
         this.backupKey = result.backupKey;
         this.showSuccess = true;
+        AppStorage.setOrCreate(AppStateKeys.JWT_TOKEN, result.token);
         Logger.info(TAG, 'Account created successfully');
       } else {
         this.errorMessage = result.errorMessage;

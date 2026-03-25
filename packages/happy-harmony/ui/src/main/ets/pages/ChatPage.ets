@@ -8,6 +8,7 @@ import { AppTypography } from '../theme/Typography';
 import { SessionMessage } from 'common';
 import { Logger } from 'common';
 import { NavParams } from 'common';
+import { AppStateKeys } from 'common';
 import { SessionViewModel } from '../viewmodels/SessionViewModel';
 import { AppViewModel } from '../viewmodels/AppViewModel';
 import { MessageList } from '../components/MessageList';
@@ -35,6 +36,7 @@ export struct ChatPage {
   @State isThinking: boolean = false;
   @State sessionTitle: string = '';
   @State loadError: string = '';
+  @StorageLink(AppStateKeys.NEW_MESSAGE_SEQ) @Watch('onNewMessageArrived') newMessageSeq: number = 0;
   private sessionViewModel: SessionViewModel | null = null;
   private appViewModel: AppViewModel = AppViewModel.getInstance();
   private sendCallback: AgentInputCallback = new AgentInputCallback();
@@ -62,6 +64,14 @@ export struct ChatPage {
 
   aboutToDisappear(): void {
     this.sessionViewModel = null;
+  }
+
+  onNewMessageArrived(): void {
+    if (this.sessionViewModel !== null && this.sessionId !== '') {
+      this.sessionViewModel.refreshMessages();
+      this.messages = this.sessionViewModel.messages;
+      this.isThinking = this.sessionViewModel.isThinking;
+    }
   }
 
   build() {

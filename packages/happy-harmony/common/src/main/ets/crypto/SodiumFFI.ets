@@ -39,9 +39,13 @@ export class SodiumFFI {
   }
 
   static sodiumInit(): number {
+    if (SodiumFFI.initialized) {
+      Logger.info(TAG, 'libsodium already initialized, skipping');
+      return 0;
+    }
     const nativeModule: ESObject = SodiumFFI.getNativeModule();
     const result: number = nativeModule.sodiumInit() as number;
-    SodiumFFI.initialized = result === 0;
+    SodiumFFI.initialized = (result === 0 || result === 1);
     if (SodiumFFI.initialized) {
       Logger.info(TAG, 'libsodium initialized successfully');
     } else {

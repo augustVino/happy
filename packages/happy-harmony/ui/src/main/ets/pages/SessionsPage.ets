@@ -6,6 +6,7 @@
 import { Session, Machine } from 'common';
 import { Logger } from 'common';
 import { NavParams } from 'common';
+import { AppStateKeys } from 'common';
 import { LightColors } from '../theme/Colors';
 import { AppTypography } from '../theme/Typography';
 import { AppViewModel } from '../viewmodels/AppViewModel';
@@ -14,6 +15,7 @@ import { SessionItem } from '../components/SessionItem';
 import { MachineList } from '../components/MachineList';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { EmptyStateView } from '../components/EmptyStateView';
+import { AuthService } from 'auth';
 import router from '@ohos.router';
 
 const TAG = 'SessionsPage';
@@ -22,6 +24,7 @@ const MACHINE_PANEL_TOP_MARGIN: number = 8;
 const MACHINE_PANEL_BOTTOM_MARGIN: number = 16;
 const LIST_PADDING: number = 8;
 const NEW_SESSION_BUTTON_SIZE: number = 36;
+const INIT_TIMEOUT_MS: number = 20000;
 
 @Entry
 @Component
@@ -30,15 +33,66 @@ export struct SessionsPage {
   private sessionDataSource: SessionDataSource = new SessionDataSource();
   @State showMachines: boolean = false;
   @State hasSessions: boolean = false;
+  @State initError: string = '';
+  @State dataReady: boolean = false;
+  private initStarted: boolean = false;
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     Logger.info(TAG, 'SessionsPage aboutToAppear');
-    this.syncSessionsToDataSource();
+
+    if (!this.initStarted) {
+      this.initStarted = true;
+      const token: string | undefined = AppStorage.get<string>(AppStateKeys.JWT_TOKEN);
+      if (token !== undefined && token !== null && token !== '') {
+        try {
+          const ok: boolean = await this.withTimeout(this.appViewModel.initialize(token), INIT_TIMEOUT_MS);
+          if (!ok) {
+            this.initError = this.appViewModel.errorMessage !== ''
+              ? this.appViewModel.errorMessage
+              : 'Initialization failed';
+          }
+        } catch (e) {
+          const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
+          this.initError = 'Timeout or error: ' + errMsg;
+          Logger.error(TAG, 'Init error: ' + errMsg);
+        }
+      }
+      this.dataReady = this.appViewModel.isDataReady;
+      this.syncSessionsToDataSource();
+    }
+  }
+
+  /**
+   * Wrap a promise with a timeout to avoid hanging forever.
+   */
+  private async withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return new Promise<T>((resolve: (value: T) => void, reject: (reason: Error) => void) => {
+      const timer = setTimeout(() => {
+        reject(new Error('Operation timed out after ' + ms + 'ms'));
+      }, ms);
+      promise.then((value: T) => {
+        clearTimeout(timer);
+        resolve(value);
+      }).catch((err: Error) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+    });
+  }
+
+  /**
+   * Logout and navigate back to Index page.
+   */
+  async onLogout(): Promise<void> {
+    Logger.info(TAG, 'Logout requested');
+    this.appViewModel.dispose();
+    const authService: AuthService = AuthService.getInstance();
+    await authService.logout();
+    router.replaceUrl({ url: 'pages/Index' });
   }
 
   /**
    * Sync AppViewModel sessions to the LazyForEach data source.
-   * Call this whenever AppViewModel sessions change (e.g., after WebSocket push).
    */
   syncSessionsToDataSource(): void {
     this.sessionDataSource.updateData(this.appViewModel.sessions);
@@ -80,6 +134,21 @@ export struct SessionsPage {
           .fontWeight(FontWeight.Bold)
           .fontColor(LightColors.TEXT_PRIMARY)
           .layoutWeight(1)
+
+        // Logout button (always visible for debugging)
+        Button() {
+          Text('Logout')
+            .fontSize(AppTypography.BODY_SMALL)
+            .fontColor(LightColors.TEXT_SECONDARY)
+        }
+        .type(ButtonType.Capsule)
+        .backgroundColor(Color.Transparent)
+        .height(NEW_SESSION_BUTTON_SIZE)
+        .padding({ left: 12, right: 12 })
+        .margin({ right: 8 })
+        .onClick(() => {
+          this.onLogout();
+        })
 
         // Machine toggle button
         Button() {
@@ -130,9 +199,40 @@ export struct SessionsPage {
         .animation({ duration: 200, curve: Curve.EaseInOut })
       }
 
-      // Content area
-      if (!this.appViewModel.isDataReady) {
-        LoadingIndicator({ message: 'Loading sessions...' })
+      // Content area - uses local @State for reliable reactivity
+      if (!this.dataReady) {
+        if (this.initError !== '') {
+          Column() {
+            Text('Initialization Failed')
+              .fontSize(AppTypography.TITLE_MEDIUM)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(LightColors.ERROR)
+              .margin({ bottom: 12 })
+
+            Text(this.initError)
+              .fontSize(AppTypography.BODY_SMALL)
+              .fontColor(LightColors.TEXT_SECONDARY)
+              .margin({ bottom: 24 })
+              .padding({ left: 24, right: 24 })
+              .wordBreak(WordBreak.BREAK_ALL)
+
+            Button('Logout & Retry')
+              .fontSize(AppTypography.BODY_MEDIUM)
+              .fontColor(LightColors.ERROR)
+              .backgroundColor(Color.Transparent)
+              .borderRadius(12)
+              .width('60%')
+              .onClick(() => {
+                this.onLogout();
+              })
+          }
+          .width('100%')
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+          .backgroundColor(LightColors.BACKGROUND)
+        } else {
+          LoadingIndicator({ message: 'Loading sessions...' })
+        }
       } else if (!this.hasSessions) {
         EmptyStateView({
           title: 'No Sessions',

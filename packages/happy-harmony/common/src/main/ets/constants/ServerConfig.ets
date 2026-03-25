@@ -11,7 +11,7 @@ const TAG = 'ServerConfig';
 const SERVER_URL_KEY = 'custom-server-url';
 const PREFERENCES_NAME = 'happy-harmony-config';
 
-const DEFAULT_SERVER_URL: string = 'https://api.cluster-fluster.com';
+const DEFAULT_SERVER_URL: string = 'http://10.66.142.27:3005';
 
 class ServerConfig {
   private static instance: ServerConfig | null = null;

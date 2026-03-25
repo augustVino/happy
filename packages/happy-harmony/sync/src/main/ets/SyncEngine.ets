@@ -138,6 +138,7 @@ class SyncEngine {
   private isInitialized: boolean = false;
   private lastSeq: number = 0;
   private profile: UserProfile | null = null;
+  private dataChangedCallback: (() => void) | null = null;
 
   private constructor() {}
 
@@ -288,6 +289,11 @@ class SyncEngine {
           Logger.warn(TAG, `Unknown update type: ${type}`);
           break;
       }
+
+      // Notify data changed after processing update
+      if (this.dataChangedCallback !== null) {
+        this.dataChangedCallback();
+      }
     } catch (e) {
       const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
       Logger.error(TAG, `Failed to handle update: ${errMsg}`);
@@ -319,6 +325,11 @@ class SyncEngine {
         default:
           Logger.warn(TAG, `Unknown ephemeral type: ${ephemeral.type}`);
           break;
+      }
+
+      // Notify data changed after processing ephemeral
+      if (this.dataChangedCallback !== null) {
+        this.dataChangedCallback();
       }
     } catch (e) {
       const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
@@ -366,6 +377,14 @@ class SyncEngine {
    */
   getLastSeq(): number {
     return this.lastSeq;
+  }
+
+  /**
+   * Register a callback to be called when data changes (sessions, machines, messages).
+   * Pass null to unregister.
+   */
+  onDataChanged(callback: (() => void) | null): void {
+    this.dataChangedCallback = callback;
   }
 
   // ---- Private methods ----
@@ -450,6 +469,11 @@ class SyncEngine {
     try {
       await this.sessionSync.fetchAll();
       Logger.info(TAG, 'Session backfill complete');
+
+      // Notify data changed after backfill
+      if (this.dataChangedCallback !== null) {
+        this.dataChangedCallback();
+      }
     } catch (e) {
       const errMsg: string = (e instanceof Error) ? (e as Error).message : String(e);
       Logger.error(TAG, `Session backfill failed: ${errMsg}`);
@@ -476,6 +500,11 @@ class SyncEngine {
       const preview: string = this.messageSync.getMessagePreview(lastMsg);
       this.sessionSync.updateLastMessagePreview(body.sid, preview);
     }
+
+    // Notify UI components that a new message arrived
+    const currentSeq: number | undefined = AppStorage.get<number>(AppStateKeys.NEW_MESSAGE_SEQ);
+    const nextSeq: number = (currentSeq !== null && currentSeq !== undefined) ? currentSeq : 0;
+    AppStorage.setOrCreate(AppStateKeys.NEW_MESSAGE_SEQ, nextSeq + 1);
   }
 
   private async handleNewSession(bodyObj: ParsedUpdateBody): Promise<void> {

@@ -22,7 +22,7 @@ export class SodiumCrypto {
   static init(): void {
     if (!SodiumFFI.isInitialized()) {
       const result = SodiumFFI.sodiumInit();
-      if (result !== 0) {
+      if (result !== 0 && result !== 1) {
         Logger.error(TAG, `Failed to initialize libsodium: ${result}`);
         throw new Error(`Failed to initialize libsodium: ${result}`);
       }

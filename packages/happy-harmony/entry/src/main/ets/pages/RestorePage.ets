@@ -6,6 +6,7 @@ import { AuthResult } from 'auth';
 import { KeyManager } from 'auth';
 import { QRAuthKeyPair } from 'common';
 import { RestoreMethod } from 'common';
+import { AppStateKeys } from 'common';
 import { LightColors } from 'ui';
 import { AppTypography } from 'ui';
 import { Base64Utils } from 'common';
@@ -93,6 +94,7 @@ export struct RestorePage {
     if (result.success) {
       this.restoreSuccess = true;
       this.statusMessage = '';
+      AppStorage.setOrCreate(AppStateKeys.JWT_TOKEN, result.token);
     } else {
       this.errorMessage = result.errorMessage || 'Restore failed';
       this.isLoading = false;
@@ -112,6 +114,7 @@ export struct RestorePage {
 
       if (result.success) {
         this.restoreSuccess = true;
+        AppStorage.setOrCreate(AppStateKeys.JWT_TOKEN, result.token);
       } else {
         this.errorMessage = result.errorMessage || 'Invalid key';
       }
